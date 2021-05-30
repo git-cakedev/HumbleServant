@@ -8,8 +8,12 @@ import datetime
 
 client = commands.Bot(command_prefix=".")
 
-TOKEN = os.getenv("DISCORD_TOKEN")
-GUILD = os.getenv("DISCORD_GUILD")
+try:
+    TOKEN = os.environ["DISCORD_TOKEN"]
+    GUILD = os.environ["DISCORD_GUILD"]
+except:
+    print("DISCORD_TOKEN and/or DISCORD_GUILD environment variables not found. Closing...")
+    exit()
 
 
 @client.event
