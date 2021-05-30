@@ -1,31 +1,28 @@
-import os
 import discord
-import datetime
-
 from discord.ext import commands
-from dotenv import load_dotenv
+import os
+import datetime
 
 # change other's nickname for an hour
 # bencoin reacts give sender a coin
 
 client = commands.Bot(command_prefix=".")
 
-load_dotenv()
 TOKEN = os.getenv("DISCORD_TOKEN")
 GUILD = os.getenv("DISCORD_GUILD")
 
 
 @client.event
 async def on_ready():
-    for guild in client.guilds:
-        if guild.name == GUILD:
-            break
+    # for guild in client.guilds:
+    #     if guild.name == GUILD:
+    #         break
 
     await client.change_presence(status=discord.Status.idle, activity=discord.Game("Listening to .help"))
 
     print(
         f'{client.user} is connected to the following guild:\n'
-        f'{guild.name} (id: {guild.id})'
+        #f'{guild.name} (id: {guild.id})'
     )
 
 
