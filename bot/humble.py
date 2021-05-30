@@ -14,15 +14,15 @@ GUILD = os.getenv("DISCORD_GUILD")
 
 @client.event
 async def on_ready():
-    # for guild in client.guilds:
-    #     if guild.name == GUILD:
-    #         break
+    for guild in client.guilds:
+        if guild.name == GUILD:
+            break
 
     await client.change_presence(status=discord.Status.idle, activity=discord.Game("Listening to .help"))
 
     print(
         f'{client.user} is connected to the following guild:\n'
-        #f'{guild.name} (id: {guild.id})'
+        f'{guild.name} (id: {guild.id})'
     )
 
 
