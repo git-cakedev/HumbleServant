@@ -1,12 +1,17 @@
+import os
 import discord
 import datetime
+from dotenv import load_dotenv
+
+load_dotenv()
+TOKEN = os.getenv("DISCORD_TOKEN")
+GUILD = os.getenv("DISCORD_GUILD")
 
 intents = discord.Intents.default()
 intents.members = True
 intents.presences = False
 
 client = discord.Client()
-print(client.intents)
 
 votes = []
 
@@ -22,7 +27,14 @@ def maxVote(sequence):
 
 @client.event
 async def on_ready():
-    print('We have logged in as {0.user}'.format(client))
+    for guild in client.guilds:
+	if guild.name == GUILD:
+	    break
+
+    print(
+	f'{client.user} is connectedto the following guild:\n'
+	f'{guild.name} (id: {guild.id})'
+    )
 
 @client.event
 async def on_reaction_add(reaction,user):
@@ -91,4 +103,4 @@ async def on_message(message):
         print(w.content)
 
 
-client.run('NzM1MDMzNjQxMDAzOTA5MjAy.XxaXbA.WSRM2btffkgkcL53diJM9yWUrNA')
+client.run(TOKEN)
