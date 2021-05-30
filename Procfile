@@ -1,1 +1,1 @@
-worker: python HumbleServant/humble.py
+worker: python bot/humble.py
