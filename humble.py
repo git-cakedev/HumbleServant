@@ -5,6 +5,9 @@ import datetime
 from discord.ext import commands
 from dotenv import load_dotenv
 
+# change other's nickname for an hour
+# bencoin reacts give sender a coin
+
 client = commands.Bot(command_prefix=".")
 
 load_dotenv()
