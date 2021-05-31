@@ -13,14 +13,12 @@ try:
     GUILD = os.environ["DISCORD_GUILD"]
 except:
     print("DISCORD_TOKEN and/or DISCORD_GUILD environment variables not found. Closing...")
-    exit()
+    raise discord.DiscordException
 
 
 @client.event
 async def on_ready():
-    for guild in client.guilds:
-        if guild.name == GUILD:
-            break
+    guild = discord.utils.get(client.guilds, name=GUILD)
 
     await client.change_presence(status=discord.Status.idle, activity=discord.Game("Listening to .help"))
 
@@ -30,7 +28,16 @@ async def on_ready():
     )
 
 
-@client.command()
+@client.event
+async def on_error(event, *args, **kwargs):
+    with open("err.log", "a") as f:
+        if event == 'on_message':
+            f.write(f"Unhandled message: {args[0]}\n")
+        else:
+            raise discord.DiscordException
+
+
+@client.command(name="ping")
 async def ping(ctx):
     await ctx.send(f"🏓 Pong with {str(round(client.latency, 2))}")
 
@@ -43,6 +50,11 @@ async def whoami(ctx):
 @client.command()
 async def clear(ctx, amount=3):
     await ctx.channel.purge(limit=amount)
+
+
+@client.command(name="whoami")
+async def members(ctx):
+    await ctx.send(f"You are {ctx.message.author.name}")
 
 
 # def maxVote(sequence):
