@@ -12,7 +12,7 @@ try:
     TOKEN = os.environ["DISCORD_TOKEN"]
     GUILD = os.environ["DISCORD_GUILD"]
 except:
-    print("DISCORD_TOKEN and/or DISCORD_GUILD environment variables not found. Closing...")
+    print("DISCORD_TOKEN and/or DISCORD_GUILD environment variables not found!")
     raise discord.DiscordException
 
 
