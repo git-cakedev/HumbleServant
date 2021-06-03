@@ -23,26 +23,17 @@ async def on_ready():
     await client.change_presence(status=discord.Status.idle, activity=discord.Game("Listening to .help"))
 
     print(
-        f'{client.user} is connected to the following guild:\n'
+        # f'{client.user.name} is connected to the following guild:\n'
         f'{guild.name} (id: {guild.id})'
     )
 
 
-@client.event
-async def on_error(event, *args, **kwargs):
-    with open("err.log", "a") as f:
-        if event == 'on_message':
-            f.write(f"Unhandled message: {args[0]}\n")
-        else:
-            raise discord.DiscordException
-
-
-@client.command(name="ping")
+@client.command()
 async def ping(ctx):
     await ctx.send(f"🏓 Pong with {str(round(client.latency, 2))}")
 
 
-@client.command(name="whoami")
+@client.command()
 async def whoami(ctx):
     await ctx.send(f"You are {ctx.message.author.name}")
 
@@ -52,10 +43,17 @@ async def clear(ctx, amount=3):
     await ctx.channel.purge(limit=amount)
 
 
-@client.command(name="whoami")
+@client.command()
 async def members(ctx):
     await ctx.send(f"You are {ctx.message.author.name}")
 
+
+@client.command()
+async def add(ctx, a: int, b: int):
+    await ctx.send(a + b)
+
+
+client.run(TOKEN)
 
 # def maxVote(sequence):
 #     if not sequence:
@@ -133,5 +131,3 @@ async def members(ctx):
 #         except:
 #             await message.channel.send(w.content)
 #         print(w.content)
-
-client.run(TOKEN)
