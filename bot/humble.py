@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 import os
+import json
 import datetime
 
 # change other's nickname for an hour
@@ -18,12 +19,15 @@ except:
 
 @client.event
 async def on_ready():
-    guild = discord.utils.get(client.guilds, name=GUILD)
+
+    print(GUILD)
+    print(client.guilds.count(GUILD))
+    guild = discord.utils.find(lambda g: g.name == GUILD, client.guilds)
 
     await client.change_presence(status=discord.Status.idle, activity=discord.Game("Listening to .help"))
 
     print(
-        # f'{client.user.name} is connected to the following guild:\n'
+        f'{client.user.name} is connected to the following guild:\n'
         f'{guild.name} (id: {guild.id})'
     )
 
