@@ -12,6 +12,10 @@ class Player:
         self.name = data['name']
         self.accounts = data['accounts']
 
+    def add_account(self, account):
+        self.accounts.append(account)
+        return self.accounts
+
 
 class Account:
     id: str
@@ -23,3 +27,10 @@ class Account:
     def update(self, data):
         self.id = data['id']
         self.balance = data['balance']
+
+    def set_balance(self, amount):
+        self.balance = amount
+        return self.balance
+
+    def add(self, amount):
+        return self.balance + amount
