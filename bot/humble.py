@@ -1,6 +1,7 @@
 import os
 import discord
-from discord.ext import commands
+from discord.ext import commands, commands
+from discord.ext.commands.cog import Cog
 
 
 # change other's nickname for an hour
@@ -15,7 +16,7 @@ except:
     raise discord.DiscordException
 
 
-class Bot(commands.cog):
+class Bot(commands.Cog):
 
     def __init__(self, command_prefix, self_bot):
         commands.Bot.__init__(
