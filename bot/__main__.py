@@ -8,7 +8,6 @@ with open("configuration.json", "r") as config:
     token = data["token"]
     prefix = data["prefix"]
 
-
 class Greetings(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
@@ -23,8 +22,9 @@ bot = commands.Bot(prefix, intents=intents)
 
 # Load cogs
 initial_extensions = [
-    "Cogs.help",
-    "Cogs.ping"
+    # "Cogs.help",
+    # "Cogs.ping"
+    "Cogs.player"
 ]
 
 print(initial_extensions)
@@ -34,7 +34,7 @@ if __name__ == '__main__':
         try:
             bot.load_extension(extension)
         except Exception as e:
-            print(f"Failed to load extension {extension}")
+            print(f"Failed to load extension {extension} {e}")
 
 
 @bot.event
@@ -44,8 +44,3 @@ async def on_ready():
     print(discord.__version__)
 
 bot.run(token)
-
-
-@commands.command(name="commandName", aliases=["aliase"])
-async def commandName(self, ctx: commands.Context):
-    await ctx.send("template command")
