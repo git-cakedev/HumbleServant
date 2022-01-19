@@ -19,8 +19,7 @@ except:
 class Bot(commands.Cog):
 
     def __init__(self, command_prefix, self_bot):
-        commands.Bot.__init__(
-            self, command_prefix=command_prefix, self_bot=self_bot)
+        commands.Bot.__init__(self, command_prefix=command_prefix, self_bot=self_bot)
 
         self.added_commands()
 

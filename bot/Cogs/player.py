@@ -1,42 +1,31 @@
-import json
-import discord
-from discord.ext import commands
-
-with open("player_data.json", "r") as data_file:
-    data = json.load()
-
-
-class Player(commands.Cog):
-    id: str
-    name: str
-
-    balance: int
-
-    def __init__(self, bot: commands.Bot, data):
-        self.bot = bot
-        self.id = data['id']
-        self.name = data['name']
-        self.balance = data['balance']
+class Player():
+    data = {
+        'name': "",
+        'balance': 0
+    }
 
     def __str__(self) -> str:
-        return 'id= {} name= {} balance= {}'.format(self.id, self.name, self.balance)
+        return 'name: {} balance: {}'.format(self.get_name(), self.get_balance())
+
+    def __json__(self):
+        return self.data
 
     def set_balance(self, amount):
-        self.balance = amount
-        return self.balance
+        self.data['balance'] = amount
+        return self.data['balance']
+
+    def get_balance(self):
+        return self.data['balance']
+
+    def get_data(self):
+        return self.data
 
     def add(self, amount):
-        return self.balance + amount
+        return self.data['balance'] + amount
 
-    @commands.command(name="commandName",
-                      usage="<usage>",
-                      description="description")
-    @commands.guild_only()
-    @commands.has_permissions()
-    @commands.cooldown(1, 2, commands.BucketType.member)
-    async def commandName(self, ctx: commands.Context):
-        await ctx.send("template command")
+    def get_name(self):
+        return self.data['id']
 
-
-def setup(bot: commands.Bot):
-    bot.add_cog(Player(bot))
+    def set_name(self, name):
+        self.data['name'] = name
+        return self.data['name']
