@@ -83,50 +83,5 @@ async def on_disconnect():
     print("bot disconnected")
     # SAVE USER DATA!
 
-'''
-@bot.event
-async def on_message(message):
-    if message.author == bot.user:
-        return
-
-    if message.content.startswith('$hello'):
-
-        id = str(message.author.id)
-
-        d = bot.players.setdefault(id, {"name": "", "balance": 0})
-
-        d["name"] = str(message.author)
-        d["balance"] += 1
-        bot.players[id] = d
-
-        with open('data.json', "w") as file:
-            new_data = bot.players
-            json.dump(new_data, file, indent=4)
-        await message.channel.send('Hello! '+str(message.author))
-'''
-'''
-@bot.event
-async def on_message(message):
-    if message.author == bot.user:
-        return
-
-    if message.content.startswith('$hello'):
-
-        id = str(message.author.id)
-        p = Player()
-
-        d = players.setdefault(id, p)
-
-        d.set_name(str(message.author))
-        d.set_balance(d.get_balance() + 1)
-        players[id] = d
-        #players.update({id: d})
-        print(players)
-        with open('data.json', "w") as file:
-            new_data = players
-            json.dump(new_data, file, indent=4)
-        await message.channel.send('Hello! '+str(message.author))
-'''
-
 
 bot.run(token)

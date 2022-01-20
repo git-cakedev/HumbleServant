@@ -8,20 +8,31 @@ class Economy(commands.Cog, name="Economy"):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command()  # this is for making a command
-    async def pingy(self, ctx):
+    async def notify(self, ctx, member: discord.Member, message: str):
 
-        await ctx.send(f'Pong! {round(self.bot.latency * 1000)}')
+        try:
+
+            channel = await member.create_dm()
+            await channel.send(message)
+            # await ctx.send(f':white_check_mark: Your Message has been sent')
+        except:
+            # await ctx.send(':x: Member had their dm close, message not sent')
+            pass
+
+    def save_json(self):
+        with open('data.json', "w") as file:
+            new_data = self.bot.players
+            json.dump(new_data, file, indent=4)
 
     @commands.Cog.listener("on_message")
     async def on_message_listener(self, message):
 
         if message.author == self.bot.user:
             return
-        r = random.randint(0, 9)
+        r = random.randint(0, 29)
 
         if r == 1:
-
+            print('here')
             id = str(message.author.id)
 
             d = self.bot.players.setdefault(id, {"name": "", "balance": 0})
@@ -30,11 +41,9 @@ class Economy(commands.Cog, name="Economy"):
             d["balance"] += 1
             self.bot.players[id] = d
 
-            await message.channel.send('Hello! '+str(message.author))
-
-        with open('data.json', "w") as file:
-            new_data = self.bot.players
-            json.dump(new_data, file, indent=4)
+            notif = "Your balance is {} bencoins".format(d["balance"])
+            self.save_json(self)
+            await self.notify(self, message.author, notif)
 
     '''
     @commands.Cog.listener("on_message")
