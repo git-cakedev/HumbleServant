@@ -19,8 +19,6 @@ intents.reactions = True
 
 
 bot = commands.Bot(prefix, intents=intents)
-vchannels = []
-tchannels = []
 
 # Load cogs
 initial_extensions = [
@@ -64,11 +62,9 @@ async def on_ready():
     print("Currently loaded extensions: " + str(actual_extensions))
     for guild in bot.guilds:
         for channel in guild.voice_channels:
-            vchannels.append(channel.id)
+            bot.vchannels.append(channel.id)
         for channel in guild.text_channels:
-            tchannels.append(channel.id)
-    # print(vchannels)
-    # print(tchannels)
+            bot.tchannels.append(channel.id)
 
     with open('data.json', "r") as jfile:
         data = json.load(jfile)
