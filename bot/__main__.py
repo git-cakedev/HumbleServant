@@ -24,7 +24,7 @@ tchannels = []
 
 # Load cogs
 initial_extensions = [
-    "Cogs.ping",
+    # "Cogs.ping",
     "Cogs.economy"
 ]
 

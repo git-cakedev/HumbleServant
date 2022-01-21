@@ -1,3 +1,4 @@
+from pydoc import describe
 import discord
 from discord.ext import commands
 import json
@@ -24,7 +25,26 @@ class Economy(commands.Cog, name="Economy"):
             new_data = self.bot.players
             json.dump(new_data, file, indent=4)
 
+    def verify_player(self, player: discord.Member or discord.User) -> bool:
+        if not str(player.id) in self.bot.players:
+            return False
+        return True
+
+    def get_player(self, player: discord.Member or discord.User):
+        id = str(player.id)
+        result = self.bot.players.setdefault(
+            id, {"name": player.name + "#" + str(player.discriminator), "balance": 0})
+        return result
+
+    @commands.command(name="balance",
+                      aliases=["b"],
+                      help="Shows your current balance of bencoins")
+    async def balance(self, ctx: commands.Context):
+        balance = self.get_player(ctx.author)["balance"]
+        await ctx.send("You have {} bencoins.".format(str(balance)))
+
     @commands.Cog.listener("on_message")
+    @commands.guild_only()
     async def on_message_listener(self, message):
 
         if message.author == self.bot.user:
@@ -35,9 +55,8 @@ class Economy(commands.Cog, name="Economy"):
 
             id = str(message.author.id)
 
-            d = self.bot.players.setdefault(id, {"name": "", "balance": 0})
+            d = self.get_player(message.author)
 
-            d["name"] = str(message.author)
             d["balance"] += 1
             self.bot.players[id] = d
 
@@ -46,53 +65,27 @@ class Economy(commands.Cog, name="Economy"):
             await self.notify(self, message.author, notif)
 
     @commands.Cog.listener("on_reaction_add")
+    @commands.guild_only()
     async def on_reaction_add(self, reaction: discord.Reaction, user: discord.Member or discord.User):
         bencoin = 848319748244897794
 
         if reaction.emoji.id == bencoin:
-            sender = self.bot.players.setdefault(
-                str(user.id), {"name": "", "balance": 0})
+            sender = self.get_player(user)
 
-            sender_balance = sender["balance"]
+            receiver = self.get_player(reaction.message.author)
 
-            receiver = self.bot.players.setdefault(
-                str(reaction.message.author.id), {"name": "", "balance": 0})
-            if sender_balance > 0:
+            if sender["balance"] > 0:
                 receiver["balance"] += 1
-                sender_balance -= 1
+                sender["balance"] -= 1
 
                 await self.notify(self, reaction.message.author, "{} gave you a bencoin reaction! Don't spend it all in one place! Your Balance: {}".format(user.name, receiver["balance"]))
 
-                await self.notify(self, user, "You gave {} a bencoin reaction! Hope it was worth it! Your Balance: {}".format(reaction.message.author.id, sender_balance))
-                print("{} sent {} a bencoin!".format(
-                    user.id, reaction.message.author.id))
+                await self.notify(self, user, "You gave {} a bencoin reaction! Hope it was worth it! Your Balance: {}".format(reaction.message.author.name, sender["balance"]))
+
             else:
+                await self.notify(self, user, "You tried to give {} a bencoin reaction but you don't have any in your wallet. Your Balance: {}".format(reaction.message.author.name, sender["balance"]))
                 await reaction.remove(user)
             self.save_json()
-
-    '''
-    @commands.Cog.listener("on_message")
-    async def on_message_listener(self, message):
-
-        if message.author == self.bot.user:
-            return
-
-        if message.content.startswith('hello'):
-
-            id = str(message.author.id)
-
-            d = self.bot.players.setdefault(id, {"name": "", "balance": 0})
-
-            d["name"] = str(message.author)
-            d["balance"] += 1
-            self.bot.players[id] = d
-
-            await message.channel.send('Hello! '+str(message.author))
-
-        with open('data.json', "w") as file:
-            new_data = self.bot.players
-            json.dump(new_data, file, indent=4)
-    '''
 
 
 def setup(bot):
