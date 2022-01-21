@@ -1,12 +1,8 @@
 import discord
 from discord.ext import commands
 import json
-import json_fix
 import sqlite3
 from sqlite3 import Error
-import os
-
-from Cogs.player import Player
 
 # Get configuration.json
 with open("configuration.json", "r") as config:
@@ -19,6 +15,8 @@ with open("configuration.json", "r") as config:
 intents = discord.Intents.default()
 intents.members = True
 intents.voice_states = True
+intents.reactions = True
+
 
 bot = commands.Bot(prefix, intents=intents)
 vchannels = []
