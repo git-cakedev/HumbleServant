@@ -60,11 +60,11 @@ async def on_ready():
     await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f"{bot.command_prefix}help"))
     print("Api Version: " + discord.__version__)
     print("Currently loaded extensions: " + str(actual_extensions))
-    for guild in bot.guilds:
-        for channel in guild.voice_channels:
-            bot.vchannels.append(channel.id)
-        for channel in guild.text_channels:
-            bot.tchannels.append(channel.id)
+    # for guild in bot.guilds:
+    #    for channel in guild.voice_channels:
+    #        bot.vchannels.append(channel.id)
+    #    for channel in guild.text_channels:
+    #        bot.tchannels.append(channel.id)
 
     with open('data.json', "r") as jfile:
         data = json.load(jfile)

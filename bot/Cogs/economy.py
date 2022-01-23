@@ -35,7 +35,7 @@ class Economy(commands.Cog, name="Economy"):
     def get_player(self, player: discord.Member or discord.User):
         id = str(player.id)
         result = self.bot.players.setdefault(
-            id, {"name": player.name + "#" + str(player.discriminator), "balance": 5, "blacklisted": False})
+            id, {"name": player.name + "#" + str(player.discriminator), "balance": 10, "blacklisted": True})
         return result
 
     @commands.command(name="balance",
@@ -58,11 +58,12 @@ class Economy(commands.Cog, name="Economy"):
 
     @commands.Cog.listener("on_message")
     @commands.guild_only()
+    @commands.cooldown(10, 2, commands.BucketType.member)
     async def on_message_listener(self, message):
 
         if message.author == self.bot.user:
             return
-        r = random.randint(0, 29)
+        r = random.randint(0, 9)
 
         if r == 1:
 
@@ -111,6 +112,8 @@ class Economy(commands.Cog, name="Economy"):
                       help="Enter an amount to bet for a chance to double your bet.")
     @commands.guild_only()
     async def cointoss(self, ctx: commands.Context, bet: int):
+        if not ctx.channel.name == "backroom-holocom-casino":
+            return
         player = self.get_player(ctx.author)
         if player["balance"] < bet:
             await ctx.send("That bet is more than your net worth...")
@@ -121,7 +124,7 @@ class Economy(commands.Cog, name="Economy"):
             if rand == 1:
                 payout = bet * 2  # double the bet
                 player["balance"] += payout
-                await ctx.send("We got a winner! You gained {} bencoins.".format(payout))
+                await ctx.send("We got a winner! You gained {} bencoins.".format(bet))
             else:
                 await ctx.send("Your donation to the exchange is appreciated.")
 
@@ -129,6 +132,19 @@ class Economy(commands.Cog, name="Economy"):
     async def cointoss_error(self, ctx, error):
         if isinstance(error, discord.ext.commands.errors.MissingRequiredArgument):
             await ctx.send("You need to enter a bet eg cointoss <bet>")
+
+    @commands.command(name="ship",
+                      aliases=["s"],
+                      usage="<usage>",
+                      description="description")
+    @commands.guild_only()
+    async def ship(self, ctx: commands.Context):
+        await ctx.send("template command")
+
+    @commands.command(help="for cale use only")
+    @commands.is_owner()
+    async def save(self, ctx):
+        return self.save_json()
 
 
 def setup(bot):
