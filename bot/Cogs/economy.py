@@ -125,7 +125,7 @@ class Economy(commands.Cog, name="Economy"):
             if rand == 1:
                 payout = math.floor(bet * 1.25)
                 player["balance"] += payout
-                await ctx.send("We got a winner! You won {} bencoins.".format(payout))
+                await ctx.send("We got a winner! You gained {} bencoins.".format(payout))
             else:
                 await ctx.send("Your donation to the exchange is appreciated.")
 
@@ -150,14 +150,14 @@ class Economy(commands.Cog, name="Economy"):
     @commands.command(name="roll",
                       aliases=["r"],
                       usage="<4|6|8|10|12|20> <bet> <guess>",
-                      description="Rolls specified dice with different returns based on selected dice if correct number is guessed.",
-                      help="d4 = 2x (25% chance), d6 = 3x (17% chance), d8 = 4x (13% chance), d10 = 5x (10% chance), d12 = 6x (8% chance), d20 = 10x (5% chance).")
+                      help="Rolls specified dice with different returns based on selected dice if correct number is guessed. d4 = 2x (25% chance), d6 = 3x (17% chance), d8 = 4x (13% chance), d10 = 5x (10% chance), d12 = 6x (8% chance), d20 = 10x (5% chance).")
     @commands.guild_only()
     async def roll(self, ctx: commands.Context, dietype: int, bet: int, guess: int):
-        if not ctx.channel.name == "backroom-holocom-casino":
+        if not (ctx.channel.name == "backroom-holocom-casino" or ctx.channel.name == "bot-test"):
             return
         allowed_die = [4, 6, 8, 10, 12, 20]
         p = self.get_player(ctx.author)
+
         if not dietype in allowed_die:
             await ctx.send("Please enter a valid die ie <4|6|8|10|12|20>")
             return
@@ -172,9 +172,9 @@ class Economy(commands.Cog, name="Economy"):
             if rand == guess:
                 payout = bet * dietype//2  # floor division to keep balance as an int
                 p["balance"] += payout
-                await ctx.send("We got a winner! You won {} bencoins.".format(payout))
+                await ctx.send("You rolled a {}, we got a winner! You gained {} bencoins.".format(rand, payout))
             else:
-                await ctx.send("Your donation to the exchange is appreciated.")
+                await ctx.send("You rolled a {}, Your donation to the exchange is appreciated.".format(rand))
 
 
 def setup(bot):
