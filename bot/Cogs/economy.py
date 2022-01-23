@@ -36,7 +36,7 @@ class Economy(commands.Cog, name="Economy"):
     def get_player(self, player: discord.Member or discord.User):
         id = str(player.id)
         result = self.bot.players.setdefault(
-            id, {"name": player.name + "#" + str(player.discriminator), "balance": 10, "blacklisted": True})
+            id, {"name": player.name + "#" + str(player.discriminator), "balance": 100, "blacklisted": True})
         return result
 
     @commands.command(name="balance",
@@ -125,7 +125,7 @@ class Economy(commands.Cog, name="Economy"):
             if rand == 1:
                 payout = math.floor(bet * 1.25)
                 player["balance"] += payout
-                await ctx.send("We got a winner! You gained {} bencoins.".format(payout))
+                await ctx.send("We got a winner! You gained {} bencoins.".format(payout - bet))
             else:
                 await ctx.send("Your donation to the exchange is appreciated.")
 
@@ -133,14 +133,6 @@ class Economy(commands.Cog, name="Economy"):
     async def cointoss_error(self, ctx, error):
         if isinstance(error, discord.ext.commands.errors.MissingRequiredArgument):
             await ctx.send("You need to enter a bet eg cointoss <bet>")
-
-    @commands.command(name="ship",
-                      aliases=["s"],
-                      usage="<usage>",
-                      description="description")
-    @commands.guild_only()
-    async def ship(self, ctx: commands.Context):
-        await ctx.send("template command")
 
     @commands.command(help="for cale use only")
     @commands.is_owner()
@@ -172,7 +164,7 @@ class Economy(commands.Cog, name="Economy"):
             if rand == guess:
                 payout = bet * dietype//2  # floor division to keep balance as an int
                 p["balance"] += payout
-                await ctx.send("You rolled a {}, we got a winner! You gained {} bencoins.".format(rand, payout))
+                await ctx.send("You rolled a {}, we got a winner! You gained {} bencoins.".format(rand, payout - bet))
             else:
                 await ctx.send("You rolled a {}, Your donation to the exchange is appreciated.".format(rand))
 

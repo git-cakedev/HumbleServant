@@ -23,7 +23,8 @@ bot = commands.Bot(prefix, intents=intents)
 # Load cogs
 initial_extensions = [
     # "Cogs.ping",
-    "Cogs.economy"
+    "Cogs.economy",
+    "Cogs.battleship"
 ]
 
 actual_extensions = []
@@ -77,5 +78,15 @@ async def on_disconnect():
     print("bot disconnected")
     # SAVE USER DATA!
 
+
+@bot.command(name="reload")
+async def reload(ctx: commands.Context):
+    actual_extensions.clear()
+    for extension in initial_extensions:
+        try:
+            bot.reload_extension(extension)
+        except Exception as e:
+            print(f"Failed to load extension {extension} {e}")
+    await ctx.send("Cogs Reloaded")
 
 bot.run(token)
