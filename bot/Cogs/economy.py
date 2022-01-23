@@ -3,6 +3,7 @@ import discord
 from discord.ext import commands
 import json
 import random
+import math
 
 
 class Economy(commands.Cog, name="Economy"):
@@ -109,22 +110,22 @@ class Economy(commands.Cog, name="Economy"):
     @commands.command(name="cointoss",
                       aliases=["toss", "ct", "t"],
                       usage="<bet>",
-                      help="Enter an amount to bet for a chance to double your bet.")
+                      help="Enter an amount to bet for a chance to 1.25x your bet. Note: you can only gain full bencoins")
     @commands.guild_only()
     async def cointoss(self, ctx: commands.Context, bet: int):
         if not ctx.channel.name == "backroom-holocom-casino":
             return
         player = self.get_player(ctx.author)
-        if player["balance"] < bet:
+        if player["balance"] < bet or bet < 1:
             await ctx.send("That bet is more than your net worth...")
             return
         else:
             rand = random.randint(0, 1)
             player["balance"] -= bet
             if rand == 1:
-                payout = bet * 2  # double the bet
+                payout = math.floor(bet * 1.25)
                 player["balance"] += payout
-                await ctx.send("We got a winner! You gained {} bencoins.".format(bet))
+                await ctx.send("We got a winner! You won {} bencoins.".format(payout))
             else:
                 await ctx.send("Your donation to the exchange is appreciated.")
 
@@ -145,6 +146,35 @@ class Economy(commands.Cog, name="Economy"):
     @commands.is_owner()
     async def save(self, ctx):
         return self.save_json()
+
+    @commands.command(name="roll",
+                      aliases=["r"],
+                      usage="<4|6|8|10|12|20> <bet> <guess>",
+                      description="Rolls specified dice with different returns based on selected dice if correct number is guessed.",
+                      help="d4 = 2x (25% chance), d6 = 3x (17% chance), d8 = 4x (13% chance), d10 = 5x (10% chance), d12 = 6x (8% chance), d20 = 10x (5% chance).")
+    @commands.guild_only()
+    async def roll(self, ctx: commands.Context, dietype: int, bet: int, guess: int):
+        if not ctx.channel.name == "backroom-holocom-casino":
+            return
+        allowed_die = [4, 6, 8, 10, 12, 20]
+        p = self.get_player(ctx.author)
+        if not dietype in allowed_die:
+            await ctx.send("Please enter a valid die ie <4|6|8|10|12|20>")
+            return
+        elif p["balance"] < bet or bet < 1:
+            await ctx.send("That bet is more than your net worth...")
+            return
+        else:
+
+            rand = random.randint(1, dietype)
+            p["balance"] -= bet
+
+            if rand == guess:
+                payout = bet * dietype//2  # floor division to keep balance as an int
+                p["balance"] += payout
+                await ctx.send("We got a winner! You won {} bencoins.".format(payout))
+            else:
+                await ctx.send("Your donation to the exchange is appreciated.")
 
 
 def setup(bot):
