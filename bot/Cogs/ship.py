@@ -7,19 +7,23 @@ class Ship():
     #    "weapons": []
     # }
 
-    def __init__(self, name="Ship 1", hp=100, speed=1, sp=0, weapons=[], value=100):
+    def __init__(self, name="Ship 1", hp=100, speed=1, sp=0, modules=[], weapons=[], value=100):
         self.data = {}
         self.data["name"] = name
         self.data["hp"] = hp
         self.data["speed"] = speed
         self.data["sp"] = sp
+        self.data["modules"] = modules
         self.data["weapons"] = weapons
         self.data["value"] = value
 
     def __str__(self):
-        result = "Name: {}\n\t HP: {}\n\t Speed: {}\n\t Shield Power: {}\n\t Weapons: {}\n\t Value: {} bencoins".format(
-            self.data["name"], self.data["hp"], self.data["speed"], self.data["sp"], self.data["weapons"], self.data["value"])
+        result = "Name: {}\n\t HP: {}\n\t Speed: {}\n\t Shield Power: {}\n\t Modules: {}\n\t Weapons: {}\n\t Value: {} bencoins".format(
+            self.data["name"], self.data["hp"], self.data["speed"], self.data["sp"], self.data["modules"], self.data["weapons"], self.data["value"])
         return result
 
     def get_data(self) -> dict:
         return self.data
+
+    def add_module(self, module):
+        self.data["modules"].append(module)

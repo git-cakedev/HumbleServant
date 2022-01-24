@@ -27,12 +27,11 @@ class Battleship(commands.Cog):
         await self.list(ctx)
 
     @ship.command(name="buy",
-                  aliases=["b"],
                   usage="[optional: <name>]",
                   help="Buy a basic ship for 100 bencoins")
-    async def buy(self, ctx, type="generic", name="Ship"):
+    async def buy(self, ctx, name="Ship"):
         player = self.get_player(ctx.author)
-        if player["balance"] < 0:
+        if player["balance"] < 100:
             await ctx.send("Insufficient funds.")
             return
 
@@ -58,7 +57,7 @@ class Battleship(commands.Cog):
         message = "Current ships in dock:"
         for ship in ships:
             s = Ship.Ship(name=ship["name"], hp=ship["hp"],
-                          speed=ship["speed"], sp=ship["sp"], weapons=ship["weapons"], value=ship["value"])
+                          speed=ship["speed"], sp=ship["sp"], modules=ship["modules"], weapons=ship["weapons"], value=ship["value"])
             data = str(s)
 
             message = message + "\n" + "\n" + str(s)
@@ -66,7 +65,6 @@ class Battleship(commands.Cog):
         await ctx.send(message)
 
     @ship.command(name="sell",
-                  aliases=["s"],
                   usage="\"<name>\"",
                   help="Sells given ship to the shop. Note: You will receive 80% of the ship's value.")
     async def sell(self, ctx, name: str):
@@ -80,8 +78,36 @@ class Battleship(commands.Cog):
                 player["balance"] += value
                 player["ships"].pop(player["ships"].index(ship))
                 await ctx.send("Nice doing business with you! {} bencoins were sent to your wallet.".format(value))
+                self.save_json()
                 return
         await ctx.send("I don't see a ship with that name in your dock...")
+
+    @ship.group(invoke_without_command=True)
+    async def miner(self, ctx):
+        await ctx.send("Do \"$help miner\" to see miner commands.")
+    '''
+    @miner.command(name="buy",
+                   usage="<ship_name>",
+                   help="Buys a bencoin miner for the given ship for 1000 bencoins")
+    async def buy(self, ctx, ship_name: str):
+        player = self.get_player(ctx.author)
+
+        if not "ships" in player.keys():
+            player["ships"] = []
+
+        for ship in player["ships"]:
+            if ship["name"] == ship_name:
+                s = Ship.Ship(name=ship["name"], hp=ship["hp"],
+                              speed=ship["speed"], sp=ship["sp"], modules=ship["modules"], weapons=ship["weapons"], value=ship["value"])
+
+                data = s.get_data()
+                if data["modules"].count("miner") > 0:
+                    await ctx.send("This ship already has a miner installed!")
+                    return
+                else:
+                    s.add_module("miner")
+                    await ctx.send("You have installed a bencoin miner to {}".format(ship_name))
+    '''
 
 
 def setup(bot: commands.Bot):

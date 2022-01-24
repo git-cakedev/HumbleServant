@@ -4,6 +4,8 @@ import json
 import sqlite3
 from sqlite3 import Error
 
+from Cogs.player import PlayerUtils
+
 # Get configuration.json
 with open("configuration.json", "r") as config:
     data = json.load(config)
@@ -23,8 +25,8 @@ bot = commands.Bot(prefix, intents=intents)
 # Load cogs
 initial_extensions = [
     # "Cogs.ping",
-    "Cogs.economy",
-    "Cogs.battleship"
+    "Cogs.economy"
+    # "Cogs.battleship"
 ]
 
 actual_extensions = []
@@ -67,19 +69,18 @@ async def on_ready():
     #    for channel in guild.text_channels:
     #        bot.tchannels.append(channel.id)
 
-    with open('data.json', "r") as jfile:
-        data = json.load(jfile)
-        bot.players = data
-        print(bot.players)
+    PlayerUtils.load_player_json(PlayerUtils)
 
 
 @bot.event
 async def on_disconnect():
     print("bot disconnected")
     # SAVE USER DATA!
+    PlayerUtils.save_player_json(PlayerUtils)
 
 
 @bot.command(name="reload")
+@commands.is_owner()
 async def reload(ctx: commands.Context):
     actual_extensions.clear()
     for extension in initial_extensions:
@@ -89,4 +90,9 @@ async def reload(ctx: commands.Context):
             print(f"Failed to load extension {extension} {e}")
     await ctx.send("Cogs Reloaded")
 
+
+@bot.command()
+@commands.is_owner()
+async def save(ctx: commands.Context):
+    PlayerUtils.save_player_json(PlayerUtils)
 bot.run(token)
