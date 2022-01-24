@@ -1,6 +1,5 @@
 import discord
 from discord.ext import commands
-import json
 import random
 import math
 from Cogs.player import Player
@@ -38,7 +37,7 @@ class Economy(commands.Cog, name="Economy"):
             notif = "Congrats, you found a bencoin! Your balance is {} bencoins".format(
                 p.get_balance())
 
-            await message.channel.send(notif, reference=message)
+            await message.channel.send(notif)
 
     @commands.Cog.listener("on_reaction_add")
     @commands.guild_only()
@@ -102,7 +101,7 @@ class Economy(commands.Cog, name="Economy"):
             PlayerUtils, ctx.message.guild.get_member(target))
         receiver.add(amount)
         sender.add(-amount)
-        await ctx.send(reference=ctx.message)
+        await ctx.send("You sent {} {} bencoins!".format(receiver.get_name(), amount), reference=ctx.message)
     '''
     @commands.command(name="roll",
                       aliases=["r"],

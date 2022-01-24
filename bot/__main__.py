@@ -3,7 +3,6 @@ from discord.ext import commands
 import json
 import sqlite3
 from sqlite3 import Error
-
 from Cogs.player import PlayerUtils
 
 # Get configuration.json

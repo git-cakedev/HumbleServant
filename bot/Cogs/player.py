@@ -1,14 +1,16 @@
-import json
 import discord
+import json
 
 
 class Player():
 
-    def __init__(self, name="", balance=1000, ships={}) -> None:
+    def __init__(self, name="", balance=1000, ships={}, items={}, stocks={}) -> None:
         self.data = {}
         self.data["name"] = name
         self.data["balance"] = balance
         self.data["ships"] = ships
+        self.data["items"] = items
+        self.data["stocks"] = stocks
 
     def __str__(self) -> str:
         return 'name: {} balance: {}'.format(self.get_name(), self.get_balance())
@@ -23,12 +25,12 @@ class Player():
     def get_balance(self) -> int:
         return self.data['balance']
 
-    def get_data(self) -> dict:
-        return self.data
-
     def add(self, amount: int) -> int:
         self.data['balance'] += amount
         return self.get_balance()
+
+    def get_data(self) -> dict:
+        return self.data
 
     def get_name(self) -> str:
         return self.data['name']
