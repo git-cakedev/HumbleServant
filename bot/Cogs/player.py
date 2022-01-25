@@ -43,34 +43,35 @@ class Player():
 class PlayerUtils():
     players = {}
 
-    def verify_player(self, player: discord.Member or discord.User) -> Player:
+    def verify_player(player: discord.Member or discord.User) -> Player:
         id = str(player.id)
-        if not id in self.players.keys():
-            return self.register_player(self, player)
+        if not id in PlayerUtils.players.keys():
+            PlayerUtils.players
+            return PlayerUtils.register_player(player)
         else:
-            p = self.players[id]
+            p = PlayerUtils.players[id]
             return p
 
-    def register_player(self, player: discord.Member or discord.User) -> Player:
+    def register_player(player: discord.Member or discord.User) -> Player:
         full_name = player.name + "#" + str(player.discriminator)
         p = Player(name=full_name)
-        self.players[str(player.id)] = p
+        PlayerUtils.players[str(player.id)] = p
         return p
 
-    def load_player_json(self):
+    def load_player_json():
         with open('data.json', "r") as file:
             data = json.load(file)
 
             for item in data.keys():
                 p = Player(name=data[item]["name"],
                            balance=data[item]["balance"])
-                self.players[item] = p
+                PlayerUtils.players[item] = p
 
-    def save_player_json(self):
+    def save_player_json():
         with open('data.json', "w") as file:
             dumpd = {}
-            for id in self.players.keys():
-                dumpd[id] = self.players.get(id).get_data()
+            for id in PlayerUtils.players.keys():
+                dumpd[id] = PlayerUtils.players.get(id).get_data()
 
             json.dump(dumpd, file, indent=4)
 

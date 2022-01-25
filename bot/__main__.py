@@ -24,7 +24,8 @@ bot = commands.Bot(prefix, intents=intents)
 # Load cogs
 initial_extensions = [
     # "Cogs.ping",
-    "Cogs.economy"
+    "Cogs.economy",
+    "Cogs.stockexchange"
     # "Cogs.battleship"
 ]
 
@@ -68,14 +69,14 @@ async def on_ready():
     #    for channel in guild.text_channels:
     #        bot.tchannels.append(channel.id)
 
-    PlayerUtils.load_player_json(PlayerUtils)
+    PlayerUtils.load_player_json()
 
 
 @bot.event
 async def on_disconnect():
     print("bot disconnected")
     # SAVE USER DATA!
-    PlayerUtils.save_player_json(PlayerUtils)
+    PlayerUtils.save_player_json()
 
 
 @bot.command(name="reload")
@@ -93,5 +94,5 @@ async def reload(ctx: commands.Context):
 @bot.command()
 @commands.is_owner()
 async def save(ctx: commands.Context):
-    PlayerUtils.save_player_json(PlayerUtils)
+    PlayerUtils.save_player_json()
 bot.run(token)

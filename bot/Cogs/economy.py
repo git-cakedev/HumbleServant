@@ -1,3 +1,4 @@
+import re
 import discord
 from discord.ext import commands
 import random
@@ -15,7 +16,7 @@ class Economy(commands.Cog, name="Economy"):
                       help="Shows your current balance of bencoins.")
     async def balance(self, ctx: commands.Context):
 
-        p = PlayerUtils.verify_player(PlayerUtils, ctx.author)
+        p = PlayerUtils.verify_player(ctx.author)
         balance = p.get_balance()
         await ctx.send("You have {} bencoins.".format(str(balance)), reference=ctx.message)
 
@@ -30,7 +31,7 @@ class Economy(commands.Cog, name="Economy"):
 
         if r == 1:
 
-            p = PlayerUtils.verify_player(PlayerUtils, message.author)
+            p = PlayerUtils.verify_player(message.author)
 
             p.add(1)
 
@@ -45,10 +46,9 @@ class Economy(commands.Cog, name="Economy"):
         bencoin = 848319748244897794
 
         if reaction.emoji.id == bencoin:
-            sender = PlayerUtils.verify_player(PlayerUtils, user)
+            sender = PlayerUtils.verify_player(user)
 
-            receiver = PlayerUtils.verify_player(
-                PlayerUtils, reaction.message.author)
+            receiver = PlayerUtils.verify_player(reaction.message.author)
 
             if sender.get_balance() > 0:
                 receiver.add(1)
@@ -64,7 +64,7 @@ class Economy(commands.Cog, name="Economy"):
     async def cointoss(self, ctx: commands.Context, bet: int):
         if not ctx.channel.name == "backroom-holocom-casino":
             return
-        player = PlayerUtils.verify_player(PlayerUtils, ctx.author)
+        player = PlayerUtils.verify_player(ctx.author)
         if player.get_balance() < bet or bet < 1:
             await ctx.send("That bet is more than your net worth...", reference=ctx.message)
             return
@@ -90,15 +90,13 @@ class Economy(commands.Cog, name="Economy"):
     async def send(self, ctx: commands.Context, target: str, amount: int):
         if amount < 0:
             return
-        sender = PlayerUtils.verify_player(PlayerUtils, ctx.author)
+        sender = PlayerUtils.verify_player(ctx.author)
         if sender.get_balance() < amount:
             await ctx.send("Insufficient Funds.", reference=ctx.message)
-        target = target.replace("@!", "")
-        target = target.replace('<', "")
-        target = target.replace('>', "")
-        target = int(target)
-        receiver = PlayerUtils.verify_player(
-            PlayerUtils, ctx.message.guild.get_member(target))
+
+        id = re.sub("[^0-9]", "", target)
+        id = int(id)
+        receiver = PlayerUtils.verify_player(ctx.message.guild.get_member(id))
         receiver.add(amount)
         sender.add(-amount)
         await ctx.send("You sent {} {} bencoins!".format(receiver.get_name(), amount), reference=ctx.message)
@@ -135,7 +133,7 @@ class Economy(commands.Cog, name="Economy"):
     @commands.command()
     async def hello(self, ctx: commands.Context, at=""):
         print(type(at))
-        print(PlayerUtils.get_playerdict(PlayerUtils))
+        print(PlayerUtils.get_playerdict())
 
 
 def setup(bot):
