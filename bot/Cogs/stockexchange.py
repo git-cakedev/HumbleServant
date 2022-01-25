@@ -21,7 +21,7 @@ class StockExchange(commands.Cog, name="StockExchange"):
         if price == None:
             await ctx.send("My advanced AI was not able to find that symbol.")
         else:
-            bencoin_price = 0
+            bencoin_price = StockUtils.convert(price)
             await ctx.send("{} current price: ${}USD or {} bencoins".format(symbol, price, bencoin_price), reference=ctx.message)
 
 

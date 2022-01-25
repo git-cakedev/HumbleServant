@@ -1,9 +1,14 @@
 import yfinance as yf
 
 
-class Stock():
-    def __init__(self, symbol: str = "MSFT"):
+class Stock(dict):
+    def __init__(self, symbol: str = "MSFT", shares=0, average=0):
         self.symbol = symbol
+        self.shares = shares
+        self.average = average
+
+    def get_data(self):
+        return {'symbol': self.symbol, 'shares': self.shares, 'average': self.average}
 
 
 class StockUtils():
@@ -13,4 +18,8 @@ class StockUtils():
         stock_price = stock.info['regularMarketPrice']
         return stock_price
 
-    def convert(price: float)
+    def convert(price: float) -> int:
+
+        result = round(price)
+        result = int(result)
+        return result
