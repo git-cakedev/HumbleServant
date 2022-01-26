@@ -1,10 +1,10 @@
-import re
 import discord
 from discord.ext import commands
 import random
 import math
 from Cogs.player import Player
 from Cogs.player import PlayerUtils
+import re
 
 
 class Economy(commands.Cog, name="Economy"):
@@ -38,7 +38,7 @@ class Economy(commands.Cog, name="Economy"):
             notif = "Congrats, you found a bencoin! Your balance is {} bencoins".format(
                 p.get_balance())
 
-            await message.channel.send(notif)
+            # await message.channel.send(notif)
 
     @commands.Cog.listener("on_reaction_add")
     @commands.guild_only()
@@ -57,9 +57,9 @@ class Economy(commands.Cog, name="Economy"):
                 await reaction.remove(user)
 
     @commands.command(name="cointoss",
-                      aliases=["toss", "ct", "t"],
+                      aliases=["ct", "t"],
                       usage="<bet>",
-                      help="Enter an amount to bet for a chance to 1.25x your bet. Note: you can only gain full bencoins")
+                      help="Enter an amount to bet for a chance to 1.25x your bet.")
     @commands.guild_only()
     async def cointoss(self, ctx: commands.Context, bet: int):
         if not ctx.channel.name == "backroom-holocom-casino":
@@ -135,6 +135,50 @@ class Economy(commands.Cog, name="Economy"):
         print(type(at))
         print(PlayerUtils.get_playerdict())
 
+    @commands.group(name="lottery",
+                    aliases=[],
+                    usage="<command>",
+                    help="Start a lottery for big monies!")
+    @commands.guild_only()
+    async def lottery(self, ctx: commands.Context):
+        self.lottery
+
+    active_lottery = False
+
+    @commands.command(name="start",
+                      aliases=["s"],
+                      usage="<bet> [seconds]",
+                      help="Start a lottery with the desired amount of time. Only one lottery is available to be active!")
+    @commands.guild_only()
+    async def start(self, ctx: commands.Context, bet: int, duration: int = 60):
+        if not self.active_lottery == True:
+            await ctx.send("There is already a lottery happening! Do $lottery join <bet>", reference=ctx.message)
+        else:
+            lottery = Lottery()
+            self.active_lottery = True
+
+            lottery.start()
+
 
 def setup(bot):
     bot.add_cog(Economy(bot))
+
+
+class Lottery():
+    active = False
+    players = []
+    pool = 0
+
+    def start():
+        Lottery.active = True
+
+    def stop():
+        Lottery.active = False
+        Lottery.players.clear()
+        Lottery.pool = 0
+
+    def get_players():
+        return Lottery.players
+
+    def add_player(name: str, bet: int):
+        Lottery.players.append((name, bet))

@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-import json
+from Cogs.player import PlayerUtils
 import Cogs.ship as Ship
 import math
 
@@ -9,28 +9,16 @@ class Battleship(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-    def save_json(self):
-        with open('data.json', "w") as file:
-            new_data = self.bot.players
-            json.dump(new_data, file, indent=4)
-
-    def get_player(self, player: discord.Member or discord.User):
-        id = str(player.id)
-        result = self.bot.players.setdefault(
-            id, {"name": player.name + "#" + str(player.discriminator), "balance": 10, "blacklisted": True})
-        return result
-
     @commands.group(invoke_without_command=True)
     async def ship(self, ctx: commands.Context):
-
         await ctx.send("Do \"$help ship\" to see ship commands.")
         await self.list(ctx)
 
     @ship.command(name="buy",
-                  usage="[optional: <name>]",
+                  usage="<name>",
                   help="Buy a basic ship for 100 bencoins")
     async def buy(self, ctx, name="Ship"):
-        player = self.get_player(ctx.author)
+        player = PlayerUtils.verify_player(ctx.author)
         if player["balance"] < 100:
             await ctx.send("Insufficient funds.")
             return
@@ -45,14 +33,14 @@ class Battleship(commands.Cog):
                 return
 
         player["ships"].append(ship.get_data())
-        self.save_json()
+
         await ctx.send("Congragulations, the mechanics are preparing your new ship!")
 
     @ship.command(name="list",
                   aliases=["l"],
                   help="Shows a list of currently owned ships.")
     async def list(self, ctx):
-        player = self.get_player(ctx.author)
+        player = PlayerUtils.verify_player(ctx.author)
         ships = player.setdefault("ships", {})
         message = "Current ships in dock:"
         for ship in ships:
@@ -68,7 +56,7 @@ class Battleship(commands.Cog):
                   usage="\"<name>\"",
                   help="Sells given ship to the shop. Note: You will receive 80% of the ship's value.")
     async def sell(self, ctx, name: str):
-        player = self.get_player(ctx.author)
+        player = PlayerUtils.verify_player(ctx.author)
         # print(player["ships"])
 
         for ship in player["ships"]:

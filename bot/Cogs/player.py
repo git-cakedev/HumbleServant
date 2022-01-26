@@ -39,6 +39,19 @@ class Player():
         self.data['name'] = name
         return self.data['name']
 
+    def get_stocks(self) -> dict:
+        return self.data['stocks']
+
+    def add_stock(self, name: str, data: dict) -> dict:
+        self.data['stocks'][name] = data
+        return self.data['stocks'][name]
+
+    def pop_stock(self, name: str) -> dict:
+        if name in self.data['stocks'].keys():
+            return self.data['stocks'].pop(name)
+        else:
+            return None
+
 
 class PlayerUtils():
     players = {}
@@ -46,7 +59,6 @@ class PlayerUtils():
     def verify_player(player: discord.Member or discord.User) -> Player:
         id = str(player.id)
         if not id in PlayerUtils.players.keys():
-            PlayerUtils.players
             return PlayerUtils.register_player(player)
         else:
             p = PlayerUtils.players[id]
@@ -54,7 +66,7 @@ class PlayerUtils():
 
     def register_player(player: discord.Member or discord.User) -> Player:
         full_name = player.name + "#" + str(player.discriminator)
-        p = Player(name=full_name)
+        p = Player(name=full_name, stocks={})
         PlayerUtils.players[str(player.id)] = p
         return p
 
@@ -64,7 +76,8 @@ class PlayerUtils():
 
             for item in data.keys():
                 p = Player(name=data[item]["name"],
-                           balance=data[item]["balance"])
+                           balance=data[item]["balance"],
+                           stocks=data[item]["stocks"])
                 PlayerUtils.players[item] = p
 
     def save_player_json():

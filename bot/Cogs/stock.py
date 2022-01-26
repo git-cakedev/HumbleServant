@@ -1,4 +1,5 @@
 import yfinance as yf
+from Cogs.player import Player, PlayerUtils
 
 
 class Stock(dict):
@@ -19,7 +20,12 @@ class StockUtils():
         return stock_price
 
     def convert(price: float) -> int:
-
         result = round(price)
         result = int(result)
         return result
+
+    def buy(player: Player, symbol: str, amount: int):
+        if symbol == 'bencoin':
+            return
+        else:
+            pass
