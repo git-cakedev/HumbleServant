@@ -1,8 +1,6 @@
 import discord
 from discord.ext import commands
 import json
-import sqlite3
-from sqlite3 import Error
 from Cogs.player import PlayerUtils
 
 # Get configuration.json
@@ -31,21 +29,6 @@ initial_extensions = [
 
 actual_extensions = []
 
-# Create db connection
-
-
-def create_connection(db_file):
-    conn = None
-    try:
-        conn = sqlite3.connect(db_file)
-        print(sqlite3.version)
-    except Error as e:
-        print(e)
-    finally:
-        if conn:
-            print("closing db connection")
-            conn.close()
-
 
 if __name__ == '__main__':
     for extension in initial_extensions:
@@ -54,7 +37,6 @@ if __name__ == '__main__':
             actual_extensions.append(extension)
         except Exception as e:
             print(f"Failed to load extension {extension} {e}")
-    # create_connection(r".\sqlite\sqlite.db")
 
 
 @bot.event
