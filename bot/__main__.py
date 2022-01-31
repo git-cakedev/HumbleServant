@@ -11,10 +11,7 @@ with open("configuration.json", "r") as config:
 
 
 # Intents
-intents = discord.Intents.default()
-intents.members = True
-intents.voice_states = True
-intents.reactions = True
+intents = discord.Intents.all()
 
 
 bot = commands.Bot(prefix, intents=intents)
@@ -22,13 +19,14 @@ bot = commands.Bot(prefix, intents=intents)
 # Load cogs
 initial_extensions = [
     # "Cogs.ping",
+    "Cogs.events",
     "Cogs.economy",
-    "Cogs.stockexchange"
+    "Cogs.stockexchange",
+    "Cogs.cargobay"
     # "Cogs.battleship"
 ]
 
 actual_extensions = []
-
 
 if __name__ == '__main__':
     for extension in initial_extensions:
@@ -61,7 +59,7 @@ async def on_disconnect():
     PlayerUtils.save_player_json()
 
 
-@bot.command(name="reload")
+@bot.command(name="reload", hidden=True)
 @commands.is_owner()
 async def reload(ctx: commands.Context):
     actual_extensions.clear()
@@ -73,7 +71,7 @@ async def reload(ctx: commands.Context):
     await ctx.send("Cogs Reloaded")
 
 
-@bot.command()
+@bot.command(hidden=True)
 @commands.is_owner()
 async def save(ctx: commands.Context):
     PlayerUtils.save_player_json()

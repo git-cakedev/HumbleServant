@@ -4,13 +4,14 @@ import json
 
 class Player():
 
-    def __init__(self, name="", balance=1000, ships={}, items={}, stocks={}) -> None:
+    def __init__(self, name="", balance=1000, ships={}, items={}, stocks={}, stats={}) -> None:
         self.data = {}
         self.data["name"] = name
         self.data["balance"] = balance
         self.data["ships"] = ships
         self.data["items"] = items
         self.data["stocks"] = stocks
+        self.data["stats"] = stats
 
     def __str__(self) -> str:
         return 'name: {} balance: {}'.format(self.get_name(), self.get_balance())
@@ -52,6 +53,16 @@ class Player():
         else:
             return None
 
+    def add_stat(self, stat, val):
+        return self.data['stats'].setdefault(stat, val)
+
+    def get_stat(self, stat):
+        try:
+
+            return self.data['stats'][stat]
+        except:
+            print("Stat not found!")
+
 
 class PlayerUtils():
     players = {}
@@ -66,7 +77,7 @@ class PlayerUtils():
 
     def register_player(player: discord.Member or discord.User) -> Player:
         full_name = player.name + "#" + str(player.discriminator)
-        p = Player(name=full_name, stocks={})
+        p = Player(name=full_name, stocks={}, stats={})
         PlayerUtils.players[str(player.id)] = p
         return p
 
@@ -90,3 +101,10 @@ class PlayerUtils():
 
     def get_playerdict(self) -> dict:
         return self.players
+
+    def get_playerid(name: str) -> int:
+        for player in PlayerUtils.players:
+            if PlayerUtils.players[player].get_name() == name:
+                return int(player)
+            # if player['name'] == name:
+            #    return int(player)

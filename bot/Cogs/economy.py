@@ -1,5 +1,7 @@
 import discord
-from discord.ext import commands
+from discord.ext import commands, tasks
+from discord.commands import \
+    slash_command
 import random
 import math
 from Cogs.player import Player
@@ -10,7 +12,11 @@ import re
 class Economy(commands.Cog, name="Economy"):
     def __init__(self, bot):
         self.bot = bot
+        self.active_lottery = self.Lottery(self.bot)
 
+    GUILD_ID = int(206125299639910402)
+
+    # @commands.slash_command(guild_ids=[GUILD_ID])
     @commands.command(name="balance",
                       aliases=["b"],
                       help="Shows your current balance of bencoins.")
@@ -130,55 +136,109 @@ class Economy(commands.Cog, name="Economy"):
             else:
                 await ctx.send("You rolled a {}, Your donation to the exchange is appreciated.".format(rand))
     '''
-    @commands.command()
+    @commands.command(hidden=True)
     async def hello(self, ctx: commands.Context, at=""):
-        print(type(at))
-        print(PlayerUtils.get_playerdict())
+        print(PlayerUtils.get_playerid("CakeDev#6693"))
+        print(self.bot.get_channel(934593180853207111))
+
+    class Lottery():
+        active = False
+        players = []
+        pool = 0
+        duration = 60.0
+
+        def __init__(self, bot):
+            self.bot = bot
+
+        async def start(self, duration: float):
+            self.active = True
+            self.duration = duration
+            self.timer.start()
+            return
+
+        @tasks.loop(seconds=duration, count=1)
+        async def timer(self):
+            print("")
+
+        @timer.after_loop
+        async def stop(self):
+            token_list = []
+            for player in self.players:
+                name = player[0]
+                total = player[1]
+
+                while total > 0:
+                    token_list.append([name, 1])
+                    total -= 1
+                    self.pool += 1
+
+            rand = random.choice(token_list)[0]
+
+            self.payout(rand, self.pool)
+            channel = self.bot.get_channel(934593180853207111)
+            winner = rand.get_name()
+            print("here")
+            await channel.send(f"The winner is {winner} with a total of {self.pool} bencoins!")
+            print("done")
+            self.active = False
+            self.players.clear()
+            self.pool = 0
+            return
+
+        def get_players(self):
+            return self.players
+
+        def add_player(self, name: Player, bet: int):
+            self.players.append([name, bet])
+
+        def payout(self, name: Player, amount: int):
+            name.add(amount)
 
     @commands.group(name="lottery",
                     aliases=[],
                     usage="<command>",
-                    help="Start a lottery for big monies!")
+                    help="Start a lottery for big monies!", invoke_without_command=True)
     @commands.guild_only()
     async def lottery(self, ctx: commands.Context):
-        self.lottery
+        print("pp")
 
-    active_lottery = False
-
-    @commands.command(name="start",
-                      aliases=["s"],
-                      usage="<bet> [seconds]",
-                      help="Start a lottery with the desired amount of time. Only one lottery is available to be active!")
+    @lottery.command(name="start",
+                     aliases=["s"],
+                     usage="<bet> [seconds]",
+                     help="Start a lottery with the desired amount of time. Only one lottery is available to be active!")
     @commands.guild_only()
-    async def start(self, ctx: commands.Context, bet: int, duration: int = 60):
-        if not self.active_lottery == True:
+    async def start(self, ctx: commands.Context, bet: int, duration: float = 60.0):
+        print(self.active_lottery.active)
+        if self.active_lottery.active == True:
             await ctx.send("There is already a lottery happening! Do $lottery join <bet>", reference=ctx.message)
         else:
-            lottery = Lottery()
-            self.active_lottery = True
+            player = PlayerUtils.verify_player(ctx.author)
+            if player.get_balance() < bet:
+                await ctx.send("Insufficient Funds.", reference=ctx.message)
+            else:
+                self.active_lottery.active = True
+                await ctx.send(f"You started a lottery. It will end in ~{duration} seconds", reference=ctx.message)
+                self.active_lottery.add_player(player, bet)
+                player.add(-bet)
+                await self.active_lottery.start(float(duration))
 
-            lottery.start()
+    @lottery.command(name="join",
+                     aliases=["j"],
+                     usage="<bet>",
+                     help="Join the lottery!")
+    @commands.guild_only()
+    async def join(self, ctx: commands.Context, bet: int):
+        if self.active_lottery.active == False:
+            await ctx.send("There is no current lottery! Do $lottery start <bet> [seconds] to start a lottery.", reference=ctx.message)
+        else:
+            player = PlayerUtils.verify_player(ctx.author)
+            if player.get_balance() < bet:
+                await ctx.send("Insufficient Funds.", reference=ctx.message)
+            else:
+                player.add(-bet)
+                await ctx.send(f"You joined the lottery! Total in the pool: {self.active_lottery.pool}", reference=ctx.message)
+                self.active_lottery.add_player(player, bet)
 
 
 def setup(bot):
     bot.add_cog(Economy(bot))
-
-
-class Lottery():
-    active = False
-    players = []
-    pool = 0
-
-    def start():
-        Lottery.active = True
-
-    def stop():
-        Lottery.active = False
-        Lottery.players.clear()
-        Lottery.pool = 0
-
-    def get_players():
-        return Lottery.players
-
-    def add_player(name: str, bet: int):
-        Lottery.players.append((name, bet))
