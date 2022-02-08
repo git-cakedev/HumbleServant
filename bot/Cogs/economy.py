@@ -1,7 +1,6 @@
 import discord
 from discord.ext import commands, tasks
-from discord.commands import \
-    slash_command
+from discord.commands import slash_command, Option
 import random
 import math
 from Cogs.player import Player
@@ -10,21 +9,22 @@ import re
 
 
 class Economy(commands.Cog, name="Economy"):
+
     def __init__(self, bot):
         self.bot = bot
         self.active_lottery = self.Lottery(self.bot)
 
     GUILD_ID = int(206125299639910402)
 
-    # @commands.slash_command(guild_ids=[GUILD_ID])
-    @commands.command(name="balance",
-                      aliases=["b"],
-                      help="Shows your current balance of bencoins.")
+    @commands.slash_command(guild_ids=[GUILD_ID],
+                            name="balance",
+                            aliases=["b"],
+                            description="Shows your current balance of bencoins.")
     async def balance(self, ctx: commands.Context):
 
         p = PlayerUtils.verify_player(ctx.author)
         balance = p.get_balance()
-        await ctx.send("You have {} bencoins.".format(str(balance)), reference=ctx.message)
+        await ctx.respond(f"You have {str(balance)} bencoins.")
 
     @commands.Cog.listener("on_message")
     @commands.guild_only()
@@ -62,17 +62,18 @@ class Economy(commands.Cog, name="Economy"):
             else:
                 await reaction.remove(user)
 
-    @commands.command(name="cointoss",
-                      aliases=["ct", "t"],
-                      usage="<bet>",
-                      help="Enter an amount to bet for a chance to 1.25x your bet.")
+    @commands.slash_command(guild_ids=[GUILD_ID],
+                            name="cointoss",
+                            aliases=["ct", "t"],
+                            usage="<bet>",
+                            description="Enter an amount to bet for a chance to double your bet.")
     @commands.guild_only()
-    async def cointoss(self, ctx: commands.Context, bet: int):
+    async def cointoss(self, ctx: commands.Context, bet: Option(int, "Bet Amount", min_value=1)):
         if not ctx.channel.name == "backroom-holocom-casino":
             return
         player = PlayerUtils.verify_player(ctx.author)
         if player.get_balance() < bet or bet < 1:
-            await ctx.send("That bet is more than your net worth...", reference=ctx.message)
+            await ctx.respond("That bet is more than your net worth...")
             return
         else:
             rand = random.randint(0, 1)
@@ -80,32 +81,34 @@ class Economy(commands.Cog, name="Economy"):
             if rand == 1:
                 payout = math.floor(bet * 2)
                 player.add(payout)
-                await ctx.send("We got a winner! You gained {} bencoins.".format(payout - bet), reference=ctx.message)
+                await ctx.respond(f"We got a winner! You gained {payout - bet} bencoins.")
             else:
-                await ctx.send("Your donation to the exchange is appreciated.", reference=ctx.message)
-
+                await ctx.respond("Your donation to the exchange is appreciated.")
+    '''
     @cointoss.error
     async def cointoss_error(self, ctx, error):
         if isinstance(error, discord.ext.commands.errors.MissingRequiredArgument):
-            await ctx.send("You need to enter a bet eg cointoss <bet>")
-
-    @commands.command(name="send",
-                      usage="@<user> <amount>",
-                      help="Sends the user specified amount from your wallet")
+            await ctx.respond("You need to enter a bet eg cointoss <bet>")
+    '''
+    @commands.slash_command(guild_ids=[GUILD_ID],
+                            name="send",
+                            usage="@<user> <amount>",
+                            description="Sends the user specified amount from your wallet")
     @commands.guild_only()
-    async def send(self, ctx: commands.Context, target: str, amount: int):
+    async def send(self, ctx: commands.Context, target: discord.Member, amount: Option(int, "Amount to send", min=1)):
         if amount < 0:
             return
         sender = PlayerUtils.verify_player(ctx.author)
         if sender.get_balance() < amount:
             await ctx.send("Insufficient Funds.", reference=ctx.message)
 
-        id = re.sub("[^0-9]", "", target)
-        id = int(id)
-        receiver = PlayerUtils.verify_player(ctx.message.guild.get_member(id))
+        #id = re.sub("[^0-9]", "", target)
+        #id = int(id)
+        #receiver = PlayerUtils.verify_player(ctx.message.guild.get_member(id))
+        receiver = PlayerUtils.verify_player(target)
         receiver.add(amount)
         sender.add(-amount)
-        await ctx.send("You sent {} {} bencoins!".format(receiver.get_name(), amount), reference=ctx.message)
+        await ctx.respond(f"You sent {target.mention} {amount} bencoins!")
     '''
     @commands.command(name="roll",
                       aliases=["r"],
